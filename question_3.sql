@@ -1,0 +1,1 @@
+-- Which German store type had the highest revenue for 2022?
