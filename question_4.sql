@@ -1,0 +1,1 @@
+-- Create a view where the rows are the store types and the columns are the total sales, percentage of total sales and the count of orders
