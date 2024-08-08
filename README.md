@@ -1,6 +1,6 @@
-** Data Analytics Power BI Report **
+## Data Analytics Power BI Report ##
 
-** Data import **
+## Data import ##
 
 1. Fact table: Orders 
     - Contains 
@@ -39,58 +39,75 @@ Connect Azure blob storage. Columns renames in title case.
         - custome regions
 One file per region (3), imported through folder, combine and transform. 
 
-## Milestone 3 info. to refine. 
-Create a measure called Total Profit which performs the following calculation:
+## Data Model
 
-For each row, subtract the Products[Cost_Price] from the Products[Sale_Price], and then multiply the result by the Orders[Product Quantity]
+### Star Schema Relationships
+- **Products[product_code]** to **Orders[product_code]**
+- **Stores[store_code]** to **Orders[store_code]**
+- **Customers[User_UUID]** to **Orders[User_ID]**
+- **Date[date]** to **Orders[Order_Date]**
+- **Date[date]** to **Orders[Shipping_Date]**
 
-Total Profit = SUMX(Orders, Orders[Product Quantity] * (Products[Sale Price]-Products[Cost Price]))
+### Active Relationships
+- Ensure the relationship between **Orders[Order_Date]** and **Date[date]** is active.
+- All relationships are one-to-many with a single filter direction from dimension tables to the fact table.
+
+### Measures Table
+- **Creation**: Create a new blank table named `Measures Table` in the Data Model View.
+- **Measures**:
+  - **Total Orders**: Counts the number of orders in the Orders table.
+  - **Total Revenue**: Multiplies `Orders[Product_Quantity]` by `Products[Sale_Price]` for each row, then sums the result.
+  - **Total Profit**: `(Products[Sale_Price] - Products[Cost_Price]) * Orders[Product_Quantity]`, summed for all rows.
+  - **Total Customers**: Counts the number of unique customers in the Orders table.
+  - **Total Quantity**: Counts the number of items sold in the Orders table.
+  - **Profit YTD**: `TOTALYTD([Total Profit], Orders[Order Date])`
+  - **Revenue YTD**: `TOTALYTD([Total Revenue], Orders[Order Date])`
+
+### Date Table
+- **Creation**: Continuous date table from the earliest `Orders[Order Date]` to the latest `Orders[Shipping Date]`.
+- **Columns**: Day of Week, Month Number, Month Name, Quarter, Year, Start of Year, Start of Quarter, Start of Month, Start of Week.
+
+### Hierarchies
+- **Date Hierarchy**: Start of Year, Start of Quarter, Start of Month, Start of Week, Date.
+- **Geography Hierarchy**: World Region, Country, Country Region.
+
+### Calculated Columns
+- **Stores[Country]**: 
+  ```DAX
+  Country = 
+  IF(Stores[Country_Code] = "GB", "United Kingdom",
+  IF(Stores[Country_Code] = "US", "United States",
+  IF(Stores[Country_Code] = "DE", "Germany",
+  "Other")))
+  ```
+- **Stores[Geography]**: 
+  ```DAX
+  Geography = Stores[Country_Region] & ", " & Stores[Country]
+  ```
+
+## Report Pages
+
+### 1. Executive Summary
+- **KPIs**: Quarterly Revenue, Orders, and Profit.
+- **Visuals**: KPIs for previous quarter metrics, targets with 5% growth, line charts, and top products table.
+
+### 2. Customer Detail
+- **Visuals**: Headline cards, Donut Chart for total customers by country, Column Chart for customers by product category, Line Chart for customers over time, top customers table with data bars, insights cards for top customer, date slicer.
+
+### 3. Product Detail
+- **Visuals**: Product descriptions, revenue, customer count, order count, profit per order, slicer toolbar for product category and country.
+
+### 4. Stores Map
+- **Visuals**: Map visual with geography hierarchy and Profit YTD bubbles, country slicer, drill-through page for store performance, top products table, column chart, profit gauges, store card, custom tooltip for profit gauge.
+
+## Cross Filtering
+- **Executive Summary Page**: Product Category bar chart and Top 10 Products table do not filter card visuals or KPIs.
+- **Customer Detail Page**: Top 20 Customers table does not filter other visuals; Total Customers by Product Donut Chart does not affect Customers line graph; Total Customers by Country donut chart cross-filters Total Customers by Product donut Chart.
+- **Product Detail Page**: Orders vs. Profitability scatter graph and Top 10 Products table do not affect other visuals.
+
+## Navigation Bar
+- **Buttons**: Custom icons for each report page with hover effects.
+- **Actions**: Page navigation for each button.
+- **Grouping**: Buttons grouped and copied across all pages.
 
 
-Create a measure called Total Customers that counts the number of unique customers in the Orders table. This measure needs to change as the Orders table is filtered, so do not just count the rows of the Customers table!
-
-Total Customers = DISTINCTCOUNT(Orders[Customer ID])
-
-
-
-Create a measure called Total Quantity that counts the number of items sold in the Orders table
-
-Total Quantity = SUM(Orders[Product Quantity])
-
-
-Create a measure called Profit YTD that calculates the total profit for the current year
-
-Profit YTD = TOTALYTD([Total Profit], Orders[Order Date])
-
-
-Create a measure called Revenue YTD that calculates the total revenue for the current year
-
-Revenue YTD = TOTALYTD([Total Revenue], Orders[Order Date])
-
-
-one for dates, to facilitate drill-down in your line charts, and one for geography, to allow you to filter our data by region, country and province/state.
-
-
-Create a date hierarchy using the following levels:
-
-Start of Year
-Start of Quarter
-Start of Month
-Start of Week
-Date
-
-
-
-Create a new calculated column in the Stores table called Country that creates a full country name for each row, based on the Stores[Country Code] column, according to the following scheme:
-GB : United Kingdom
-US : United States
-DE : Germany
-
-Country = 
-IF(Stores[Country Code] = "GB", "United Kingdom",
-IF(Stores[Country Code] = "US", "United States",
-IF(Stores[Country Code] = "DE", "Germany",
-"Other")))
-
-
-In addition to the country hierarchy, it can sometimes be helpful to have a full geography column, as in some cases this makes mapping more accurate. Create a new calculated column in the Stores table called Geography that creates a full geography name for each row, based on the Stores[Country Region], and Stores[Country] columns, separated by a comma and a space.
