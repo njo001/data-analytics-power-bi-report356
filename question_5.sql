@@ -1,0 +1,1 @@
+-- Which product category generated the most profit for the "Wiltshire, UK" region in 2021?
