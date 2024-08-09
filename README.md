@@ -110,4 +110,21 @@ One file per region (3), imported through folder, combine and transform.
 - **Actions**: Page navigation for each button.
 - **Grouping**: Buttons grouped and copied across all pages.
 
+### SQL Queries for Non-Power BI Users
 
+For users who do not have access to Power BI, the following SQL queries were written to answer specific questions about the dataset. The results of these queries were exported as CSV files and are available in the GitHub repository along with the corresponding SQL query files.
+
+#### 1. How many staff are there in all of the UK stores?
+A query was created to count the total number of staff employed in all stores located in the United Kingdom. 
+
+#### 2. Which month in 2022 had the highest revenue?
+A query was written to determine the month in the year 2022 with the highest revenue. This involved aggregating sales data by month and identifying the month with the maximum revenue. 
+
+#### 3. Which German store type had the highest revenue for 2022?
+A query was developed to find out which type of store in Germany generated the most revenue in 2022. The revenue data was aggregated by store type, and the type with the highest revenue was identified. 
+
+#### 4. Created a view.
+A view was created to display store types with corresponding columns for total sales, percentage of total sales, and the count of orders. This view provided a summary of sales performance by store type. 
+
+#### 5. Which product category generated the most profit for the "Wiltshire, UK" region in 2021?
+A query was executed to identify which product category generated the highest profit in the "Wiltshire, UK" region for the year 2021. 
